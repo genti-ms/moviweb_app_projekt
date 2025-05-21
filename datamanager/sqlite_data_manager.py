@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from data_manager_interface import DataManagerInterface
-from models import Base, User, Movie
+from .data_manager_interface import DataManagerInterface
+from .models import Base, User, Movie
+
 
 class SQLiteDataManager(DataManagerInterface):
     def __init__(self, db_file_name):
