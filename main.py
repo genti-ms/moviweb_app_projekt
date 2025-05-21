@@ -1,13 +1,17 @@
-from data_manager import DataManager
+from sqlite_data_manager import SQLiteDataManager
 
 def main():
-    dm = DataManager()
-    users = dm.get_all_users()
-    print("Users:", users)
+    dm = SQLiteDataManager("db.sqlite")
 
-    user_id = 1
-    movies = dm.get_user_movies(user_id)
-    print(f"Movies for user {user_id}:", movies)
+    dm.add_user("Anna")
+    dm.add_user("Max")
+
+    dm.add_movie("Inception", "Christopher Nolan", 2010, 8.8, 1)
+    dm.add_movie("The Matrix", "The Wachowskis", 1999, 8.7, 1)
+    dm.add_movie("Interstellar", "Christopher Nolan", 2014, 8.6, 2)
+
+    print("Users:", dm.get_all_users())
+    print("Movies for user 1:", dm.get_user_movies(1))
 
 if __name__ == "__main__":
     main()
