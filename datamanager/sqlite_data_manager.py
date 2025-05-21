@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from .data_manager_interface import DataManagerInterface
 from .models import Base, User, Movie
 
-
 class SQLiteDataManager(DataManagerInterface):
     def __init__(self, db_file_name):
         self.engine = create_engine(f"sqlite:///{db_file_name}")
@@ -15,6 +14,14 @@ class SQLiteDataManager(DataManagerInterface):
         users = session.query(User).all()
         session.close()
         return [{"id": user.id, "name": user.name} for user in users]
+
+    def get_user_by_id(self, user_id):
+        session = self.Session()
+        user = session.query(User).filter_by(id=user_id).first()
+        session.close()
+        if user:
+            return {"id": user.id, "name": user.name}
+        return None
 
     def get_user_movies(self, user_id):
         session = self.Session()
@@ -34,6 +41,21 @@ class SQLiteDataManager(DataManagerInterface):
         ]
         session.close()
         return movies
+
+    def get_movie_by_id(self, movie_id):
+        session = self.Session()
+        movie = session.query(Movie).filter_by(id=movie_id).first()
+        session.close()
+        if movie:
+            return {
+                "id": movie.id,
+                "name": movie.name,
+                "director": movie.director,
+                "year": movie.year,
+                "rating": movie.rating,
+                "user_id": movie.user_id,
+            }
+        return None
 
     def add_user(self, name):
         session = self.Session()

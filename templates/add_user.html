@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Add New User - MovieWeb App</title>
+</head>
+<body>
+    <h1>Add a New User</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li style="color: {% if category == 'error' %}red{% elif category == 'success' %}green{% else %}black{% endif %};">
+              {{ message }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('add_user') }}">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required />
+        <button type="submit">Add User</button>
+    </form>
+
+    <a href="{{ url_for('list_users') }}">Back to Users</a>
+</body>
+</html>
