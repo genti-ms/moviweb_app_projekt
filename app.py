@@ -10,7 +10,7 @@ data_manager = SQLiteDataManager('db.sqlite')
 @app.route('/')
 def home():
     """Home page route - simple welcome message."""
-    return "<h1>Welcome to MovieWeb App!</h1><p><a href='/users'>View Users</a></p>"
+    return render_template('home.html')
 
 @app.route('/users')
 def list_users():

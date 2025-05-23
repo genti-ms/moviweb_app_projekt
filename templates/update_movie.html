@@ -1,26 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Update Movie for {{ user.name }} - MovieWeb App</title>
-</head>
-<body>
-    <h1>Update Movie for {{ user.name }}</h1>
-    <form method="post">
-        <label for="title">Title:</label>
-        <input type="text" name="title" id="title" value="{{ movie.name }}" required /><br/>
+{% extends "base.html" %}
 
-        <label for="director">Director:</label>
-        <input type="text" name="director" id="director" value="{{ movie.director }}" /><br/>
+{% block title %}Update Movie for {{ user.name }} - MovieWeb App{% endblock %}
 
-        <label for="year">Year:</label>
-        <input type="number" name="year" id="year" value="{{ movie.year }}" /><br/>
+{% block content %}
+<h1 class="mb-4">Update Movie for {{ user.name }}</h1>
 
-        <label for="rating">Rating:</label>
-        <input type="number" step="0.1" min="0" max="10" name="rating" id="rating" value="{{ movie.rating }}" /><br/>
+<form method="post" class="needs-validation" novalidate>
+  <div class="mb-3">
+    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+    <input type="text" class="form-control" id="title" name="title" value="{{ movie.name }}" required>
+    <div class="invalid-feedback">Please provide a movie title.</div>
+  </div>
 
-        <button type="submit">Update Movie</button>
-    </form>
-    <a href="{{ url_for('user_movies', user_id=user.id) }}">Back to Movies</a>
-</body>
-</html>
+  <div class="mb-3">
+    <label for="director" class="form-label">Director</label>
+    <input type="text" class="form-control" id="director" name="director" value="{{ movie.director }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="year" class="form-label">Year</label>
+    <input type="number" class="form-control" id="year" name="year" value="{{ movie.year }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="rating" class="form-label">Rating</label>
+    <input type="number" step="0.1" min="0" max="10" class="form-control" id="rating" name="rating" value="{{ movie.rating }}">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Movie</button>
+  <a href="{{ url_for('user_movies', user_id=user.id) }}" class="btn btn-secondary ms-2">Back to Movies</a>
+</form>
+
+<script>
+// Bootstrap Form validation
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}
