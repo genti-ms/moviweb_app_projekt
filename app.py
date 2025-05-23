@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, flash
 from datamanager.sqlite_data_manager import SQLiteDataManager
+from api import api
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # TODO: Move secret key to environment variable for security
 
 # Initialize DataManager with the correct database file
 data_manager = SQLiteDataManager('db.sqlite')
+
+# Register the API blueprint
+app.register_blueprint(api, url_prefix='/api')
 
 
 def get_user_or_404(user_id):
@@ -48,7 +52,7 @@ def user_movies(user_id):
     """
     user = get_user_or_404(user_id)
     movies = data_manager.get_user_movies(user_id)
-    return render_template('user_movies.html', user=user, movies=movies)
+    return render_template('user_movies.html', user=user, movies=movies, data_manager=data_manager)
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
@@ -141,11 +145,35 @@ def page_not_found(e):
     """Render a custom 404 error page."""
     return render_template('404.html', error=e), 404
 
-
 @app.errorhandler(500)
 def internal_server_error(e):
     """Render a custom 500 error page."""
     return render_template('500.html', error=e), 500
+
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/add_review', methods=['GET', 'POST'])
+def add_review(user_id, movie_id):
+    """
+    Display form to add a review for a movie (GET).
+    Handle form submission and store the review in the database (POST).
+    """
+    user = get_user_or_404(user_id)
+    movie = get_movie_or_404(movie_id)
+
+    if request.method == 'POST':
+        review_text = request.form.get('review_text')
+        rating = request.form.get('rating')
+
+        if not review_text or not rating:
+            flash("Review text and rating are required.", "error")
+            return render_template('add_review.html', user=user, movie=movie), 400
+
+        data_manager.add_review(user_id, movie_id, review_text, int(rating))
+        flash("Review successfully added!", "success")
+        return redirect(url_for('user_movies', user_id=user_id))
+
+    return render_template('add_review.html', user=user, movie=movie)
+
+
 
 
 if __name__ == '__main__':

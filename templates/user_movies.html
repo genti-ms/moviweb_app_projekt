@@ -8,14 +8,38 @@
 {% if movies %}
   <ul class="list-group mb-3">
     {% for movie in movies %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          <strong>{{ movie.name }}</strong> ({{ movie.year }})
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <strong>{{ movie.name }}</strong> ({{ movie.year }}) - Rating: {{ movie.rating }}/10
+          </div>
+          <div>
+            <a href="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+               class="btn btn-sm btn-outline-primary me-2">Edit</a>
+            <a href="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Are you sure you want to delete this movie?');">Delete</a>
+          </div>
         </div>
-        <div>
-          <a href="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
-          <a href="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}" class="btn btn-sm btn-outline-danger"
-             onclick="return confirm('Are you sure you want to delete this movie?');">Delete</a>
+
+        <!-- Review section -->
+        <div class="ms-3">
+          <h6>Reviews:</h6>
+          {% set reviews = data_manager.get_reviews_for_movie(movie.id) %}
+          {% if reviews %}
+            <ul class="list-unstyled">
+              {% for review in reviews %}
+                <li class="mb-2">
+                  <strong>{{ review.username }}</strong> rated it {{ review.rating }}/10<br>
+                  <em>{{ review.review_text }}</em>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No reviews yet.</p>
+          {% endif %}
+          <a href="{{ url_for('add_review', user_id=user.id, movie_id=movie.id) }}"
+             class="btn btn-sm btn-outline-success">Add Review</a>
         </div>
       </li>
     {% endfor %}
@@ -24,6 +48,7 @@
   <p>No movies found.</p>
 {% endif %}
 
+<!-- Action Buttons -->
 <a href="{{ url_for('add_movie', user_id=user.id) }}" class="btn btn-primary me-2">Add Movie</a>
 <a href="{{ url_for('list_users') }}" class="btn btn-secondary">Back to Users</a>
 {% endblock %}

@@ -12,6 +12,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     movies = relationship("Movie", back_populates="user")
+    reviews = relationship("Review", back_populates="user")  # Neue Beziehung
 
 class Movie(Base):
     """
@@ -26,3 +27,19 @@ class Movie(Base):
     rating = Column(Float, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="movies")
+    reviews = relationship("Review", back_populates="movie")  # Neue Beziehung
+
+class Review(Base):
+    """
+    ORM model for reviews table.
+    Each review belongs to a user and a movie and contains text and a rating.
+    """
+    __tablename__ = "reviews"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    movie_id = Column(Integer, ForeignKey("movies.id"))
+    review_text = Column(String, nullable=False)
+    rating = Column(Float, nullable=True)
+
+    user = relationship("User", back_populates="reviews")
+    movie = relationship("Movie", back_populates="reviews")

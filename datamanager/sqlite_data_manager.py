@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .data_manager_interface import DataManagerInterface
-from .models import Base, User, Movie
+from .models import Base, User, Movie, Review
+
+
 
 
 class SQLiteDataManager(DataManagerInterface):
@@ -142,3 +144,51 @@ class SQLiteDataManager(DataManagerInterface):
                 session.commit()
         finally:
             session.close()
+
+    def add_review(self, user_id, movie_id, review_text, rating):
+        """
+        Add a review for a movie by a specific user.
+        """
+        session = self.Session()
+        try:
+            review = Review(
+                user_id=user_id,
+                movie_id=movie_id,
+                review_text=review_text,
+                rating=rating,
+            )
+            session.add(review)
+            session.commit()
+        finally:
+            session.close()
+
+    def get_reviews_for_movie(self, movie_id):
+        """
+        Retrieve all reviews for a given movie along with the reviewer's username.
+
+        Args:
+            movie_id (int): The ID of the movie to get reviews for.
+
+        Returns:
+            list of dict: Each dict contains 'review_text', 'rating', and 'username'.
+        """
+        session = self.Session()
+        try:
+            reviews = (
+                session.query(Review, User)
+                .join(User, Review.user_id == User.id)
+                .filter(Review.movie_id == movie_id)
+                .all()
+            )
+            return [
+                {
+                    "review_text": review.review_text,
+                    "rating": review.rating,
+                    "username": user.name,
+                }
+                for review, user in reviews
+            ]
+        finally:
+            session.close()
+
+
