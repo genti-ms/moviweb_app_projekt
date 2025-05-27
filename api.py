@@ -1,18 +1,32 @@
-from flask import Blueprint, jsonify, request
-from datamanager.sqlite_data_manager import SQLiteDataManager
-
+from flask import Blueprint, jsonify, request, current_app
 
 api = Blueprint('api', __name__)
-data_manager = SQLiteDataManager("db.sqlite")  #
+
+def get_data_manager():
+    """
+    Retrieve the DataManager instance from the Flask app configuration.
+
+    Raises:
+        RuntimeError: If no DataManager is configured in the app.
+
+    Returns:
+        SQLiteDataManager: The data manager instance used for data operations.
+    """
+    data_manager = current_app.config.get("DATA_MANAGER")
+    if not data_manager:
+        raise RuntimeError("Data manager not configured in app.")
+    return data_manager
+
 
 @api.route('/users', methods=['GET'])
 def get_users():
     """
-    Get a list of all users.
+    Retrieve all users.
 
     Returns:
-        JSON list of users, each user is a dict with 'id' and 'name'.
+        Response: JSON response containing a list of all users.
     """
+    data_manager = get_data_manager()
     users = data_manager.get_all_users()
     return jsonify(users)
 
@@ -20,15 +34,16 @@ def get_users():
 @api.route('/users/<int:user_id>/movies', methods=['GET'])
 def get_user_movies(user_id):
     """
-    Get all favorite movies for a specific user.
+    Retrieve all favorite movies for a given user.
 
     Args:
-        user_id (int): The ID of the user.
+        user_id (int): ID of the user whose movies are requested.
 
     Returns:
-        JSON list of movies if found,
-        or JSON error message with 404 status if no movies or user not found.
+        Response: JSON response containing the list of movies for the user,
+                  or an error message with 404 status if not found.
     """
+    data_manager = get_data_manager()
     movies = data_manager.get_user_movies(user_id)
     if movies:
         return jsonify(movies)
@@ -39,21 +54,22 @@ def get_user_movies(user_id):
 @api.route('/users/<int:user_id>/movies', methods=['POST'])
 def add_user_movie(user_id):
     """
-    Add a new movie for a specific user.
+    Add a new movie to a user's favorite list.
 
-    Expects JSON body with at least:
-        - name (str): The movie name (required)
+    Expects JSON body with keys:
+        - name (str): Movie name (required)
         - director (str, optional)
         - year (int, optional)
         - rating (float, optional)
 
     Args:
-        user_id (int): The ID of the user.
+        user_id (int): ID of the user to add the movie to.
 
     Returns:
-        JSON success message with 201 status on success,
-        or JSON error message with 400 status if required data missing.
+        Response: JSON success message with 201 status on success,
+                  or error message with 400 status if data is invalid.
     """
+    data_manager = get_data_manager()
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
