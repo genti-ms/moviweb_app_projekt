@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class DataManagerInterface(ABC):
 
     @abstractmethod
@@ -24,3 +25,18 @@ class DataManagerInterface(ABC):
             List[dict]: A list of movies belonging to the user.
         """
         pass
+
+    @abstractmethod
+    def user_exists(self, user_id):
+        """
+        Check if a user exists by their ID.
+
+        Args:
+            user_id (int): The ID of the user.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
+
+    pass
+

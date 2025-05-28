@@ -47,7 +47,7 @@ def test_update_movie_get(client):
 
 def test_delete_movie(client):
     # Test Löschen eines Films (Movie 1 bei User 1)
-    response = client.get('/users/1/delete_movie/1', follow_redirects=True)
+    response = client.post('/users/1/delete_movie/1', follow_redirects=True)
     assert response.status_code in [200, 404]
 
 def test_404_page(client):

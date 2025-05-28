@@ -50,6 +50,22 @@ class SQLiteDataManager(DataManagerInterface):
         finally:
             session.close()
 
+    def user_exists(self, user_id):
+        """
+        Check if a user exists by their ID.
+
+        Args:
+            user_id (int): The ID of the user.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
+        session = self.Session()
+        try:
+            return session.query(User).filter_by(id=user_id).count() > 0
+        finally:
+            session.close()
+
     def get_user_movies(self, user_id):
         """
         Return a list of movies belonging to a user as dicts.
